@@ -5,6 +5,8 @@ import com.springsecurity.login.model.Usuario;
 import com.springsecurity.login.repository.UsuarioRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ public class UsuarioController {
 
 
     @GetMapping
+    @Cacheable(value = "listaDeUsuarios")
     public ResponseEntity<Object> buscarTodos () {
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
@@ -30,6 +33,7 @@ public class UsuarioController {
 
 
     @PostMapping
+    @CacheEvict(value = "listaDeUsuarios", allEntries = true)
     public void salvar(@RequestBody Usuario usuario) {
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
         String senha = bcrypt.encode(usuario.getSenha());
